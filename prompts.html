@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>프롬프트 편집 · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="prompts"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group"><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group"><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group" open><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group"><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group"><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>프롬프트 편집</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>모니모 Agent의 프롬프트 탭은 작성한 지침, 백엔드가 조합하는 실행 지침, 실제 API 도구 설명을 나누어 편집합니다. 문구 편집과 엔진의 검증·도구 권한 변경은 별개입니다.</p>
+<details class="section section-2" id="_1"><summary><span role="heading" aria-level="2">기본 모드와 고급 모드</span></summary><div class="section-body">
+<p>기본 모드는 기존 자동 조합을 사용합니다. 고급 프롬프트 구성은 공통 블록과 단계별 목록을 편집합니다. 단계별 목록이 있으면 공통 목록을 대체하므로 공통에서 지운 문구가 resume나 afterTools에 남아 있지 않은지 확인하세요. 저장된 워크플로우가 실제 실행하는 입력입니다.</p>
+</div></details><details class="section section-2" id="_2"><summary><span role="heading" aria-level="2">지원 단계와 블록</span></summary><div class="section-body">
+<p>단계는 initial·afterTools·correction·resume·final·summarize·compress·structuredOutput입니다. 블록마다 고유 id·title, 필요한 role·text 또는 source를 둡니다. 단계당 최대 32블록이며 텍스트는 최대 65,536자입니다. source는 configuredInstructions·instructions·history·context·input·toolExchange입니다.</p>
+<p>일반 단계는 history·input·toolExchange를 각각 정확히 한 번 포함해야 하며 보호 그룹을 조건부로 숨길 수 없습니다. 보조 요약·압축·구조화 단계는 별도 구성을 따릅니다. when 조건과 part는 엔진이 지원하는 값만 사용하며 알 수 없는 단계·변수는 PROMPT_LAYOUT_INVALID입니다.</p>
+</div></details><details class="section section-2" id="_3"><summary><span role="heading" aria-level="2">실행 변수</span></summary><div class="section-body">
+<table>
+<thead>
+<tr>
+<th>변수</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$runtime.instructions.configured</code></td>
+<td>작성자가 입력한 지침</td>
+</tr>
+<tr>
+<td><code>$runtime.instructions.runtimeRule</code></td>
+<td>실행 컨텍스트 안내</td>
+</tr>
+<tr>
+<td><code>$runtime.instructions.toolPolicy</code></td>
+<td>도구 사용 안내</td>
+</tr>
+<tr>
+<td><code>$runtime.instructions.vault</code></td>
+<td>Vault 참조 지침</td>
+</tr>
+<tr>
+<td><code>$runtime.instructions.subagents</code></td>
+<td>하위 에이전트 지침</td>
+</tr>
+<tr>
+<td><code>$runtime.skills.candidates</code>, <code>.declared</code>, <code>.body</code></td>
+<td>현재 후보·선언·실행 본문</td>
+</tr>
+<tr>
+<td><code>$runtime.slots.context</code></td>
+<td>슬롯 실행 문맥</td>
+</tr>
+<tr>
+<td><code>$runtime.humanFeedback</code></td>
+<td>재개 응답</td>
+</tr>
+<tr>
+<td><code>$runtime.tools</code>, <code>.names</code></td>
+<td>도구 정의 또는 이름</td>
+</tr>
+<tr>
+<td><code>$runtime.bridge.instructions</code></td>
+<td>브릿지 안내</td>
+</tr>
+<tr>
+<td><code>$runtime.routing.instructions</code>, <code>.retry</code></td>
+<td>라우팅·재시도 문구</td>
+</tr>
+</tbody>
+</table>
+<p>그 밖에 instructions·context·input·memory·response·correction 변수도 지원합니다. 실행 변수는 모델 호출마다 결정합니다. 설정한 지침에 자동 엔진 지침 전체가 숨어 있다고 가정하지 말고 각 블록과 실제 모델 요청을 확인하세요.</p>
+</div></details><details class="section section-2" id="_4"><summary><span role="heading" aria-level="2">내부 도구 설명 편집</span></summary><div class="section-body">
+<p>declare_skills·declare_fallback·slot_fill·request_user_input·call_native_bridge·표 도구, 지식 검색과 A2A handoff 등의 설명을 편집합니다. 편집하지 않은 도구는 기본 설명을 유지합니다. 지원되는 템플릿 변수만 사용하며 도구 스키마와 권한·서버 처리기는 그대로입니다. slot_fill 설명 칸에 genos-slots 절차 본문을 넣지 않습니다.</p>
+<p>Vault 안내는 메시지 블록과 도구 description 사본 모두에 영향을 줄 수 있습니다. 메시지 미리보기만 보지 말고 모델 요청의 tools를 함께 확인합니다. <code>$runtime.tools</code>는 자기 문구가 재귀 포함되지 않도록 안내 추가 전 기본 도구 정의를 참조합니다.</p>
+</div></details><details class="section section-2" id="_5"><summary><span role="heading" aria-level="2">실제 요청 확인과 메모리 표시</span></summary><div class="section-body">
+<p>실행 상세의 모델 요청에서 메시지·도구·단계별 블록 포함 판정을 확인합니다. 상위 노드 Input과 실제 provider에 전달된 API 요청은 다를 수 있습니다. 장기 recall 본문은 실행 상세에서 생략될 수 있고 모델 관측의 보호 로그에서 확인합니다. 화면에서 안 보인다는 이유로 모델에도 전달되지 않았다고 판단하지 마세요.</p>
+<p>문구를 삭제해도 스킬·슬롯 검증, Vault 복원·만료, 체인 실행, qvo 계약, 오류·사용자 응답 전달은 유지됩니다. 프롬프트 편집은 실행 권한을 푸는 기능이 아닙니다.</p>
+<p>근거: <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/agentPromptLayout.ts">agentPromptLayout.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/agentPromptConditions.ts">agentPromptConditions.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/internalToolPrompts.ts">internalToolPrompts.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/prompt-editor-injection-audit.ko.md">prompt-editor-injection-audit.ko.md</a>.</p></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/prompts.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

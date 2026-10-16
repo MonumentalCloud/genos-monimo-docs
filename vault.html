@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>genos-vault · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="vault"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group"><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group" open><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group"><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group"><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group"><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>genos-vault</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>Vault는 명시적으로 선언한 출력값을 서버에 저장하고, 실행 중인 모델에는 <code>{{$vault.CUSTOMER_&lt;UUID&gt;}}</code> 같은 참조를 줍니다. 모델은 이 참조를 업무 도구의 인자나 답변에 사용할 수 있고, 서버가 필요한 시점에 실제 값을 복원합니다. 일반 값에는 <code>vault_load</code> 호출 단계가 없습니다.</p>
+<details class="section section-2" id="_1"><summary><span role="heading" aria-level="2">설정 화면</span></summary><div class="section-body">
+<details class="section section-3" id="vault"><summary><span role="heading" aria-level="3">전역 Vault 설정 열기</span></summary><div class="section-body">
+<p>워크플로우 캔버스 오른쪽 위 <strong>설정 톱니바퀴 → Vault 설정 (전체 Flowise)</strong> 를 엽니다. <strong>모든 워크플로우에 공통 적용</strong>이라는 설명을 확인하세요.</p>
+<figure><a href="assets/vault-menu.jpg" target="_blank" rel="noopener"><span class="crop" style="aspect-ratio:420.0/220.00000000000003"><img src="assets/vault-menu.jpg" alt="캔버스 설정 메뉴의 Vault 설정 전체 Flowise" style="width:350.0%;left:-250.00000000000003%;top:0.0%" loading="lazy"></span></a><figcaption>캔버스 설정 메뉴의 Vault 설정 전체 Flowise · 눌러 원본 보기</figcaption></figure>
+
+</div></details><details class="section section-3" id="_2"><summary><span role="heading" aria-level="3">유형과 저장 방식 고르기</span></summary><div class="section-body">
+<p>제목이 <strong>Flowise Settings · Vault</strong>, 첫 영역이 <strong>Vault 저장 허용 유형</strong>이면 맞는 화면입니다. <strong>유형 추가</strong>로 <code>CUSTOMER</code>를 입력하고 <strong>저장 방식</strong>을 선택합니다.</p>
+<figure><a href="assets/vault-storage-options.jpg" target="_blank" rel="noopener"><span class="crop" style="aspect-ratio:900.0/655.0"><img src="assets/vault-storage-options.jpg" alt="Vault 유형 이름과 저장 방식 선택 목록" style="width:163.33333333333334%;left:-31.666666666666668%;top:-4.885496183206107%" loading="lazy"></span></a><figcaption>Vault 유형 이름과 저장 방식 선택 목록 · 눌러 원본 보기</figcaption></figure>
+
+<p><strong>확인할 항목:</strong> 기준 버전의 선택지는 <strong>기본 값·객체·목록·객체 · 필드 매핑</strong>입니다. 새 원시 타입·인라인 중첩 편집기는 아직 반영되지 않은 별도 변경입니다.</p>
+<p>객체 전체를 하나의 참조로 전달하려면 <strong>객체</strong>를 고릅니다. 아래 <strong>구조 텍스트 편집</strong>은 설명을 쓰는 선택 사항이므로, 객체 저장 자체를 위해 켤 필요는 없습니다.</p>
+<figure><a href="assets/vault-object-settings.jpg" target="_blank" rel="noopener"><span class="crop" style="aspect-ratio:900.0/655.0"><img src="assets/vault-object-settings.jpg" alt="객체 저장 방식과 구조 텍스트 편집 옵션" style="width:163.33333333333334%;left:-31.666666666666668%;top:-4.885496183206107%" loading="lazy"></span></a><figcaption>객체 저장 방식과 구조 텍스트 편집 옵션 · 눌러 원본 보기</figcaption></figure>
+
+<p>전역 유형을 바꾸려면 이 화면의 <strong>저장</strong>을 사용합니다. 캔버스의 워크플로우 저장과는 다른 설정입니다.</p>
+</div></details><details class="section section-3" id="_3"><summary><span role="heading" aria-level="3">표를 사용할 때만 노드 설정 켜기</span></summary><div class="section-body">
+<p><strong>모니모 Agent → 설정 → 표 데이터 → 표 데이터 처리</strong>를 확인하세요. <code>table</code> 선언과 표 도구를 사용할 노드에서 켭니다.</p>
+<figure><a href="assets/monimo-table-settings.jpg" target="_blank" rel="noopener"><span class="crop" style="aspect-ratio:600.0/655.0"><img src="assets/monimo-table-settings.jpg" alt="모니모 Agent의 표 데이터 처리 토글" style="width:245.0%;left:-72.5%;top:-4.885496183206107%" loading="lazy"></span></a><figcaption>모니모 Agent의 표 데이터 처리 토글 · 눌러 원본 보기</figcaption></figure>
+
+<p><strong>확인할 항목:</strong> <strong>표 데이터 처리</strong>와 <strong>화이트리스트 수집</strong>은 서로 다른 옵션입니다. 표 토글만 꺼도 전역에 등록된 일반 Vault 유형의 처리는 유지될 수 있습니다.</p>
+</div></details></div></details><details class="section section-2" id="_4"><summary><span role="heading" aria-level="2">데모로 참조 복원 확인하기</span></summary><div class="section-body">
+<p>객체 전체, 특정 필드, 문장 안의 참조를 바꿔 보세요. 모델이 보내는 참조와 업무 도구가 받는 실제 값을 비교할 수 있습니다. 없는 키와 사용할 수 없는 참조도 확인해 보세요.</p>
+<iframe class="demo-frame" title="Vault 참조 복원 데모" src="demos/vault.html" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+<p class="caption">합성 동작 데모 · 실제 도구 호출 없음 · <a href="demos/vault.html" target="_blank" rel="noopener">크게 열기</a></p>
+
+</div></details><details class="section section-2" id="_5"><summary><span role="heading" aria-level="2">객체 하나 저장하고 다시 사용하기</span></summary><div class="section-body">
+<p><strong>Settings → Vault</strong>에서 <code>CUSTOMER</code>를 등록하고 저장 방식을 <strong>객체</strong>로 선택하세요. 그런 다음 도구가 아래 결과를 반환하도록 합니다.</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;payload&quot;: {
+    &quot;customer&quot;: {&quot;name&quot;: &quot;예제 고객&quot;, &quot;balance&quot;: 120000, &quot;active&quot;: false},
+    &quot;genos-vault&quot;: [{&quot;type&quot;: &quot;CUSTOMER&quot;, &quot;path&quot;: &quot;$output.payload.customer&quot;}]
+  }
+}
+</code></pre>
+<p>모델에게 보이는 <code>payload.customer</code>는 발급된 참조로 바뀝니다. 반환된 문자열을 그대로 사용하세요. 데모의 UUID는 설명용이며, 실제 참조를 임의로 만들거나 줄여서는 안 됩니다.</p>
+<pre><code class="language-json">{&quot;customer&quot;: &quot;{{$vault.CUSTOMER_a0000000-0000-4000-8000-000000000001}}&quot;}
+</code></pre>
+<p>업무 도구에는 원래 JSON 객체가 전달됩니다. <code>{{$vault.CUSTOMER_a0000000-0000-4000-8000-000000000001.balance}}</code>를 사용하면 숫자 <code>120000</code>이 전달됩니다. 필드 접근자는 중괄호 안에 넣으세요. <code>}}</code> 뒤에 <code>.balance</code>를 붙이면 필드 선택이 되지 않습니다.</p>
+</div></details><details class="section section-2" id="_6"><summary><span role="heading" aria-level="2">저장 방식 고르기</span></summary><div class="section-body">
+<table>
+<thead>
+<tr>
+<th>이 브랜치의 저장 방식</th>
+<th>모델이 받는 값</th>
+<th>알아둘 점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>기본 값</td>
+<td>선언한 값의 참조</td>
+<td>유형 이름만으로 원시 타입이나 업무 스키마를 검증하지 않음</td>
+</tr>
+<tr>
+<td>객체 또는 목록</td>
+<td>전체 값의 참조 하나</td>
+<td>모든 키를 선언하지 않아도 중첩 키·인덱스 접근 가능</td>
+</tr>
+<tr>
+<td>객체 · 필드 매핑</td>
+<td>매핑한 필드가 참조로 바뀐 원래 구조</td>
+<td>매핑하지 않은 필드는 그대로 보이며, 없는 필드는 만들지 않음</td>
+</tr>
+<tr>
+<td>표 데이터 처리를 켠 <code>table</code></td>
+<td>표 참조</td>
+<td>객체 행의 배열이 필요하며, 일반 객체 접근 대신 표 도구를 제공</td>
+</tr>
+</tbody>
+</table>
+<p><code>{"name": str, "balance": number}</code> 같은 <code>shape</code> 텍스트는 모델에 값의 구조를 설명합니다. 업무 값을 검증하거나 필드를 개별 참조로 나누는 설정은 <strong>아닙니다</strong>. 이 브랜치에서 중첩 필드 매핑은 별도로 등록한 유형을 연결합니다. PR #23737의 인라인 중첩 필드 편집기와 명시적 원시 타입 선택은 아직 반영되지 않은 Vault 후속 브랜치에 있습니다.</p>
+</div></details><details class="section section-2" id="_7"><summary><span role="heading" aria-level="2">기술 사양과 주의사항</span></summary><div class="section-body">
+<details class="section section-3" id="_8"><summary><span role="heading" aria-level="3">참조와 복원 경계</span></summary><div class="section-body">
+<ul>
+<li>
+<p>선언 경로의 시작점은 참조로 바꾼 결과가 아니라 원래 도구 JSON입니다. <code>$output.payload.customer.name</code>과 JSON Pointer <code>/payload/customer/name</code>은 같은 필드를 가리킵니다. 선언은 <code>payload</code> 안에 두고 대상도 해당 payload 안에 있어야 합니다.</p>
+</li>
+<li>
+<p>인자 전체를 참조로 지정하면 객체·배열·<code>0</code>·<code>false</code>·null을 포함한 원래 JSON 타입으로 복원합니다. 없는 키는 오류이며, null은 존재하는 값입니다.</p>
+</li>
+<li>
+<p>업무 도구에 전달할 문장 안에서는 참조가 문자열·유한 숫자·boolean이어야 합니다. 객체나 배열 전체를 문장에 넣으면 거절합니다. 사용자 표시 문구에서는 구조화된 값을 JSON으로 표시하거나 설정한 렌더링 콜백을 사용할 수 있습니다.</p>
+</li>
+<li>
+<p>일반 저장값은 <code>.key</code>, <code>[0]</code>, <code>["full name"]</code>으로 접근합니다. 와일드카드·슬라이스·함수·<code>.length</code>는 지원하지 않습니다. 표 참조에는 대신 <code>table_load</code>, <code>table_filter</code>, <code>table_calculate</code>를 사용합니다.</p>
+</li>
+<li>
+<p>Vault에서 읽은 값은 데이터로 유지됩니다. 저장된 문자열이 또 다른 Vault 참조나 체인 선언처럼 보여도 재귀적으로 복원하거나 실행하지 않습니다.</p>
+</li>
+<li>
+<p>저장 허용 유형은 인스턴스 전체 설정입니다. 저장 허용이 AIM <code>unmask</code> 권한을 부여하지는 않습니다. 표 데이터 처리는 별도의 노드 설정입니다.</p>
+</li>
+<li>
+<p>슬롯과 슬롯의 후보·검증·입구도구는 Vault 접근을 거절합니다. 체인에서 사용할 수 있는 참조라고 해서 슬롯 절차에서도 사용할 수 있는 것은 아닙니다.</p>
+</li>
+</ul>
+</div></details><details class="section section-3" id="_9"><summary><span role="heading" aria-level="3">보관 기간과 실패 처리</span></summary><div class="section-body">
+<p>Vault 보관 범위는 사용자 주체, 세션, 루트 턴으로 구분합니다. 위임된 실행은 루트 범위를 공유합니다. 실행 중이거나 응답을 기다리는 동안에는 일반 만료 기한 없이 유지합니다. 실행이 최종 종료되면 범위를 닫고 30분의 보관 기한을 설정합니다. 닫힌 범위에는 새 값을 쓸 수 없습니다. 저장할 때마다 캐시 TTL이 갱신되는 슬롯 상태와는 다릅니다.</p>
+<p>저장 오류는 안전한 코드와 비차단 <code>vaultFeedback</code>으로 전달합니다. 이미 완료된 업무 결과를 실패로 바꾸지는 않습니다. 선언했지만 저장하지 못한 값은 모델이 사용할 수 없습니다. 이후 참조 복원이 실패하면 업무 도구 호출이나 사용자에게 보낼 답변 초안을 차단합니다. 참조를 수정하거나 값이 없어 사용할 수 없다고 설명하세요. 복원 실패만을 이유로 완료된 업무를 다시 실행하지 마세요.</p>
+<p>Vault가 원문을 이후 모든 모델 문맥에서 영구히 숨기는 것은 아닙니다. 사용자에게 복원해 보여준 답변이나 카드 문구는 대화 이력에 저장되어 다음 턴에 나타날 수 있습니다. 보호된 백엔드 추적 로그도 기존 접근 권한·마스킹·암호화 정책에 따라 복원 내역을 보관할 수 있습니다.</p>
+</div></details><details class="section section-3" id="_10"><summary><span role="heading" aria-level="3">기술 한도와 표시 콜백</span></summary><div class="section-body">
+<table>
+<thead>
+<tr>
+<th>설정 또는 한도</th>
+<th>현재 값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>등록 유형 이름</td>
+<td>최대 64개, <code>[A-Z][A-Z0-9_]{0,63}</code></td>
+</tr>
+<tr>
+<td>필드 매핑</td>
+<td>정의당 최대 64개, 중첩 깊이 최대 8단계</td>
+</tr>
+<tr>
+<td>일반 저장값</td>
+<td>직렬화한 스냅샷 최대 2 MiB</td>
+</tr>
+<tr>
+<td>표</td>
+<td>최대 10,000행·100열, JSON 2 MiB</td>
+</tr>
+<tr>
+<td>저장소 한도</td>
+<td>한 범위의 저장소별 최대 32개 스냅샷·16 MiB</td>
+</tr>
+<tr>
+<td>참조 등장 횟수 제한</td>
+<td>선택적 인스턴스 설정. 미설정·null·0이면 횟수 제한 없음</td>
+</tr>
+</tbody>
+</table>
+<p>최종 표시 콜백은 <code>reference</code>, <code>type</code>, <code>value</code>, <code>before</code>, <code>after</code>, <code>path</code>를 담은 <code>replacement</code>를 받습니다. 정확히 <code>{text: string, consumeAfter: number}</code>를 반환하세요. 인스턴스 전체에 적용되는 콜백을 저장하기 전에 가상 입력으로 내장 미리보기를 확인하세요. 이전 조사 콜백은 <code>{particle, consumeAfter}</code>를 반환하므로 두 형식을 혼용하면 안 됩니다. 업무 인자 복원은 원래 타입을 유지하며, 표시 형식이 도구 입력 스키마를 대신하지 않습니다.</p>
+<p><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/vault-user-guide.ko.md">Vault 사용자 가이드</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/vaultDefinitions.ts">유형 정의</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/vaultArguments.ts">인자 복원</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/tabularStore.ts">저장 수명</a>.</p>
+</div></details></div></details><details class="section section-2" id="_11"><summary><span role="heading" aria-level="2">선언 키와 경로의 모든 지원 형식</span></summary><div class="section-body">
+<p>선언은 도구 반환 JSON의 <code>payload["genos-vault"]</code> 또는 <code>payload.genosVault</code>에 둡니다. 두 키가 있으면 기존 <code>genos-vault</code>만 사용합니다. 기존 키가 비어 있거나 잘못되어도 별칭으로 넘어가지 않습니다. MCP text에 들어 있는 JSON도 그 JSON 문서를 루트로 해석합니다.</p>
+<table>
+<thead>
+<tr>
+<th>경로</th>
+<th>대상</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$output.payload.customer</code></td>
+<td>객체 전체</td>
+</tr>
+<tr>
+<td><code>$output.payload.customers[0].name</code></td>
+<td>첫 행의 이름</td>
+</tr>
+<tr>
+<td><code>$output.payload["a/b"]</code></td>
+<td>특수 문자가 있는 키</td>
+</tr>
+<tr>
+<td><code>/payload/a~1b</code></td>
+<td>같은 위치의 JSON Pointer</td>
+</tr>
+</tbody>
+</table>
+<p>대상은 payload 안이어야 합니다. 음수 인덱스·슬라이스·와일드카드·함수·다른 루트는 지원하지 않습니다. 숫자 인덱스는 배열에만 쓰고 객체의 숫자 문자열 키는 <code>["0"]</code>처럼 씁니다. 같은 위치를 두 문법으로 중복 선언하면 <code>TABLE_DUPLICATE_PATH</code>입니다. 누락 경로는 <code>TABLE_PATH_NOT_FOUND</code>, 문법 오류는 <code>TABLE_INVALID_PATH</code>입니다.</p>
+</div></details><details class="section section-2" id="_12"><summary><span role="heading" aria-level="2">참조 접근자의 세부 규칙</span></summary><div class="section-body">
+<p>발급 참조의 중괄호 안에서 <code>.address.city</code>, <code>[0]</code>, <code>["full name"]</code>을 붙입니다. 일반 객체·목록 전체와 그 안의 중첩 값은 원래 JSON 타입으로 복원합니다. <code>0</code>, <code>false</code>, <code>null</code>은 값 없음이 아닙니다. 빈 객체·빈 배열도 전체 참조로 사용할 수 있지만 빈 배열의 <code>[0]</code>은 오류입니다. <code>.length</code>나 JavaScript 연산은 접근자가 아닙니다. table은 일반 접근자 대신 표 도구를 사용합니다.</p>
+<p>업무 도구의 문장 안에는 문자열·유한 숫자·boolean만 넣습니다. 객체·배열을 문장에 끼워 넣으면 <code>VAULT_TEMPLATE_VALUE_INVALID</code>입니다. 최종 답변과 HITL 표시는 별도 JSON 표시 규칙을 사용할 수 있습니다. 저장된 값이 참조처럼 생겼어도 다시 참조로 해석하지 않습니다.</p>
+</div></details><details class="section section-2" id="_13"><summary><span role="heading" aria-level="2">필드 매핑과 유형 정의</span></summary><div class="section-body">
+<p>현재 정의의 키는 <code>name</code>, <code>shapeKind</code>, <code>shape</code>, <code>fields</code>입니다. <code>shapeKind</code>는 object 또는 list이며 fields와 함께 사용할 수 없습니다. <code>shape</code>는 작성한 구조 설명으로 업무 검증 스키마가 아닙니다. fields는 <code>{name,type}</code> 배열이며 중첩 객체는 별도 등록한 유형을 연결합니다. 순환 정의·알 수 없는 유형·중복 필드 이름은 거절합니다.</p>
+<p>매핑하지 않은 필드는 모델에 그대로 보입니다. 없는 필드는 생성하지 않습니다. 보호하려는 값의 범위를 설계할 때 객체 전체 저장과 부분 필드 매핑을 혼동하지 마세요. 아직 병합되지 않은 명시적 원시 타입과 인라인 중첩 정의를 이 버전의 입력으로 사용하지 않습니다.</p>
+</div></details><details class="section section-2" id="_14"><summary><span role="heading" aria-level="2">한국어 조사 선택 함수</span></summary><div class="section-body">
+<p>전역 Vault 설정에서 참조 뒤 조사를 결정하는 JavaScript를 설정할 수 있습니다. 입력 <code>replacement</code>에는 <code>reference</code>, <code>type</code>, <code>value</code>, <code>before</code>, <code>after</code>, <code>path</code>가 있습니다. 반환은 <code>{particle, consumeAfter}</code>이며 뒤 원문의 앞부분을 consumeAfter만큼 소비합니다. <code>selectKoreanParticle(value, pair, manual)</code>은 은/는·이/가·을/를·과/와·으로/로·아/야·이랑/랑·이나/나를 지원합니다. 한글 종성으로 판단할 수 없는 값은 작성자가 수동 선택해야 합니다.</p>
+<p>코드 제한은 50,000자입니다. 전체 답변을 바꾸는 훅이 아니라 참조 하나와 바로 뒤 조사 범위의 처리입니다. 임의 네트워크 호출이나 비동기 코드로 사용하지 않습니다.</p>
+</div></details><details class="section section-2" id="_15"><summary><span role="heading" aria-level="2">최종 응답 렌더링 함수</span></summary><div class="section-body">
+<p>조사 선택과 별도로 최종 응답 표시 함수가 있습니다. 반환은 정확히 <code>{text: string, consumeAfter: number}</code>입니다. 참조를 text로 바꾸고 뒤 원문 앞에서 consumeAfter만큼 제거하며 나머지는 유지합니다. consumeAfter는 after 길이 안의 정수이고 서로게이트 쌍 중간을 자를 수 없습니다. 객체 목록을 Markdown 표로 표시하는 등 표현 방식은 작성자가 정합니다.</p>
+<p>코드 16,000자, 입력 JSON·출력 문자열 100,000자, 호출당 1초 제한입니다. require·process·fetch·네트워크·비동기 실행은 제공하지 않습니다. 미리보기는 합성 replacement로 실행하며 실제 Vault를 조회하지 않습니다. 함수 저장은 전역이며 이후 최종 응답 치환에 적용됩니다. 실패한 부분 응답은 사용자에게 내보내지 않고 보호 로그와 오류 코드로 확인합니다.</p>
+</div></details><details class="section section-2" id="vault_1"><summary><span role="heading" aria-level="2">슬롯과 Vault의 경계</span></summary><div class="section-body">
+<p>슬롯 후보도구·검증도구·입구도구와 내부 슬롯 도구는 Vault 참조 처리 대상에서 제한됩니다. 일반 체인에서 Vault를 사용할 수 있다는 이유로 슬롯에도 같은 규칙이 적용된다고 가정하지 마세요. <code>VAULT_REFERENCE_NOT_SUPPORTED_FOR_SLOTS</code>라면 슬롯의 원본 검증 결과와 확정값을 사용해야 합니다.</p>
+<p>근거: <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/vaultDefinitions.ts">vaultDefinitions.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/vaultReference.ts">vaultReference.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/vaultReplacement.ts">vaultReplacement.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/vault-user-guide.ko.md">vault-user-guide.ko.md</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/genos-vault-output-paths.md">genos-vault-output-paths.md</a>.</p></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/vault.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

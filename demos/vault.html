@@ -1,0 +1,38 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>Vault 참조 복원 데모</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../assets/style.css"><body class="demo"><div id="vault-lesson">
+  <div class="viz-controls"><label class="form-label">저장된 고객값 사용 방식
+    <select class="form-select" id="vault-case">
+      <option value="whole">객체 전체를 인자로 전달</option><option value="field">잔액 필드를 인자로 전달</option><option value="false">boolean 필드를 인자로 전달</option><option value="text">문장 안에 이름 넣기</option><option value="structured">업무 문장 안에 객체 넣기</option><option value="missing">없는 필드 참조</option><option value="unavailable">사용할 수 없는 참조</option>
+    </select></label></div>
+  <div class="vault-flow">
+    <section><h3>모델이 보내는 값</h3><pre><code id="vault-input"></code></pre></section>
+    <section><h3 id="vault-output-title">업무 도구가 받는 값</h3><pre><code id="vault-output"></code></pre></section>
+  </div>
+  <p id="vault-status" aria-live="polite"></p>
+</div>
+<style>
+#vault-lesson .vault-flow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:16px}
+#vault-lesson pre{white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:0;color:var(--foreground)}
+@media(max-width:560px){#vault-lesson .vault-flow{grid-template-columns:minmax(0,1fr);gap:8px}}
+</style>
+<script>
+(()=>{
+ const root=document.getElementById('vault-lesson'),select=root.querySelector('#vault-case');
+ const base='$vault.CUSTOMER_a0000000-0000-4000-8000-000000000001',ref=key=>'{{'+base+key+'}}';
+ const customer={name:'예제 고객',balance:120000,active:false};
+ const cases={
+ whole:{input:{customer:ref('')},output:{customer},note:'인자 전체의 참조는 JSON 타입을 유지하며 객체로 복원합니다.'},
+ field:{input:{amount:ref('.balance')},output:{amount:customer.balance},note:'필드 접근자는 중괄호 안에 넣습니다. 금액은 문자열이 아닌 숫자로 전달됩니다.'},
+ false:{input:{active:ref('.active')},output:{active:false},note:'false는 실제 저장된 값입니다. 값이 없는 상태가 아닙니다.'},
+ text:{input:{message:'안녕하세요, '+ref('.name')},output:{message:'안녕하세요, 예제 고객'},note:'문자열·숫자·boolean은 업무 도구에 전달할 문장에 넣을 수 있습니다.'},
+ structured:{input:{message:'고객: '+ref('')},output:{error:'VAULT_TEMPLATE_VALUE_INVALID',toolExecuted:false},note:'업무 문장에는 객체·배열을 넣을 수 없습니다. 사용자 표시는 별도의 JSON·렌더링 규칙을 따릅니다.',error:true},
+ missing:{input:{city:ref('.city')},output:{error:'VAULT_PATH_KEY_NOT_FOUND',toolExecuted:false},note:'없는 키는 오류입니다. 서버가 값을 추측해서 채우지 않습니다.',error:true},
+ unavailable:{input:{customer:'{{$vault.CUSTOMER_b0000000-0000-4000-8000-000000000002}}'},output:{error:'VAULT_REFERENCE_EXPIRED_OR_UNKNOWN',toolExecuted:false},note:'이 예제 저장소에는 해당 참조가 없습니다. 업무 도구는 실행하지 않습니다.',error:true}
+ };
+ let state={example:'whole'};
+ const apply=v=>{state={example:v&&Object.hasOwn(cases,v.example)?v.example:'whole'};select.value=state.example;const item=cases[state.example];root.querySelector('#vault-input').textContent=JSON.stringify(item.input,null,2);root.querySelector('#vault-output').textContent=JSON.stringify(item.output,null,2);root.querySelector('#vault-output-title').textContent=item.error?'도구 호출 차단':'업무 도구가 받는 값';root.querySelector('#vault-status').textContent=item.note;};
+ apply(window.openai?.widgetState?.modelContent);
+ select.addEventListener('change',()=>{apply({example:select.value});window.openai?.setWidgetState?.({modelContent:{demo:'vault',...state},privateContent:null}).catch(()=>{});});
+ window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)apply(e.detail.globals.widgetState.modelContent);});
+})();
+</script>
+</body></html>

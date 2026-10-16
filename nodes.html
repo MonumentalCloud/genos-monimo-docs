@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>모델과 MCP 노드 · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="nodes"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group"><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group"><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group" open><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group"><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group"><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>모델과 MCP 노드</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>변경된 Flowise 노드를 사용 목적과 실제 연결로 구분합니다. 모니모 Agent의 옵션을 기본 Agent나 독립 Tool·LLM 노드의 동작으로 일반화하지 않습니다.</p>
+<details class="section section-2" id="_1"><summary><span role="heading" aria-level="2">모델 노드</span></summary><div class="section-body">
+<p>ChatMnc·ChatOpenAI·ChatOpenAICustom·MncOpenAIEmbedding과 Agentflow LLM·Agent 경로가 변경되었습니다. 모델 요청의 trace 문맥, 메시지·도구 직렬화, 기본 모델 설정과 출력 경계를 확인해야 합니다. 한 provider에서 확인한 모델 요청을 다른 provider의 실제 전송 검증으로 대신하지 않습니다.</p>
+</div></details><details class="section section-2" id="genosmcp"><summary><span role="heading" aria-level="2">GenosMCP 도구 선택</span></summary><div class="section-body">
+<p>연결된 MCP의 사용가능한 도구 목록을 고르면 해당 액션을 사용합니다. 목록을 비워 두면 런타임에서 서버 도구 전체가 열릴 수 있습니다. 설계 화면은 체인 전용·폴백 도구를 개별 이름으로 선택할 수 있도록 빈 선택 MCP의 실제 도구 목록을 조회합니다. 조회 실패 시 노드 이름만 표시될 수 있으므로 실제 실행 이름과 일치하는지 확인하세요.</p>
+<p>공식 MCP 입력 스키마와 모델용 설명·스키마, 실행 시 검증을 구분합니다. 일반 직접 호출은 원래 스키마로, 체인의 qvo 자동 감싸기와 슬롯 입구 입력포맷은 각기 별도 규칙으로 동작합니다. _meta의 브릿지·확인 선언과 표준 annotation hint도 구분하세요.</p>
+</div></details><details class="section section-2" id="_2"><summary><span role="heading" aria-level="2">도구 이름과 실행 이력</span></summary><div class="section-body">
+<p>모델의 도구 이름은 ASCII 문자·숫자·밑줄·하이픈으로 정리하며 길이 제한을 적용합니다. 표시용 한국어 이름과 런타임 호출 이름은 다를 수 있습니다. 스킬 tools, 체인 tool, 체인 전용·폴백 목록은 실제 호출 이름에 맞춰야 합니다. 실행 상세에는 편집한 내부 도구 설명과 실제 모델 요청의 도구 정의를 함께 확인합니다.</p>
+</div></details><details class="section section-2" id="_3"><summary><span role="heading" aria-level="2">기타 변경 노드</span></summary><div class="section-body">
+<p>CurrentDateTime, RetrieverTool, Tool·Retriever Agentflow, GenOS 장기 메모리 노드도 포함합니다. 정확한 입력 선언과 분기 조건은 노드별 입력 선언, 파일별 변경 함수와 연결 커밋은 전체 변경 색인에서 볼 수 있습니다. 이름만 보고 동작을 추측하지 않도록 소스 링크를 같이 제공합니다.</p>
+<p>근거: <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/tools/MCP/GenosMCP/GenosMCP.ts">GenosMCP.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/tools/MCP/core.ts">core.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosMcpSelect.ts">genosMcpSelect.ts</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosMcpTags.ts">genosMcpTags.ts</a>.</p>
+</div></details><details class="section section-2" id="chatmnc"><summary><span role="heading" aria-level="2">ChatMnc 제한시간과 재시도</span></summary><div class="section-body">
+<p>ChatMnc의 Timeout을 비워 두면 현재 기본 제한시간은 <strong>60,000ms</strong>, 자동 재시도 기본값은 <strong>1회</strong>입니다. 제한시간과 A2A 전체 요청 기한은 별개이므로 재시도까지 포함한 총 시간을 고려하세요.</p>
+<table>
+<thead>
+<tr>
+<th>설정</th>
+<th>적용 규칙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>노드 Timeout</td>
+<td>유효한 양수 입력이 환경변수보다 우선합니다. 1 이상은 정수로 내림합니다.</td>
+</tr>
+<tr>
+<td>GENOS_LLM_TIMEOUT_MS</td>
+<td>노드에 유효한 값이 없을 때 적용합니다. <code>0</code>은 무제한이며 미설정·잘못된 값은 60,000ms입니다.</td>
+</tr>
+<tr>
+<td>GENOS_LLM_MAX_RETRIES</td>
+<td>유효한 0 이상 숫자는 정수로 내림합니다. 미설정·잘못된 값은 1입니다.</td>
+</tr>
+</tbody>
+</table>
+<p>이 기본값은 ChatMnc가 사용하는 해석 함수의 계약입니다. 다른 모델 노드 전체에 같은 상한이 강제된다고 가정하지 않습니다.</p>
+</div></details><details class="section section-2" id="mcp"><summary><span role="heading" aria-level="2">MCP 연결 수명</span></summary><div class="section-body">
+<p>MCP 세션 정리는 <code>GENOS_MCP_SESSION_CLEANUP</code>의 기본값 true, 클라이언트 재사용은 <code>GENOS_MCP_CLIENT_REUSE</code>의 기본값 false입니다. 재사용을 켰을 때 <code>GENOS_MCP_CLIENT_IDLE_MS</code> 기본 30,000ms, <code>GENOS_MCP_CLIENT_MAX_AGE_MS</code> 기본 300,000ms가 적용됩니다. 연결 풀은 toolkit 내에서 관리하며 동시 요청이 하나의 클라이언트를 중복 사용하지 않도록 합니다. 세션 ID를 발급한 연결이나 SSE 폴백은 재사용 대상이 아닙니다. 환경 설정 변경 후 해당 프로세스를 재시작하세요.</p>
+</div></details><details class="section section-2" id="currentdatetime"><summary><span role="heading" aria-level="2">CurrentDateTime의 한국 시간</span></summary><div class="section-body">
+<p>날짜·시간·요일·ISO8601 출력을 호스트 시간대나 tzdata와 무관한 UTC+9 기준으로 맞춥니다. 서버가 UTC로 실행되더라도 한국 시간 기준 출력인지 확인하세요.</p>
+<p>근거: <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosLlmDefaults.ts">genosLlmDefaults.ts</a>.</p></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/nodes.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

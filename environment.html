@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>환경변수 참조 · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="environment"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group"><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group"><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group"><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group"><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group" open><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>환경변수 참조</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>현재 확인한 Flowise 변경 소스에서 직접 참조하는 GenOS·스킬 환경변수 이름과 읽는 위치입니다. 배포 환경의 실제 값·비밀정보는 포함하지 않습니다. 이 목록은 환경변수를 새로 설정하라는 권장이 아닙니다. 기본값·유효값·적용 범위는 해당 기능 설명과 소스의 해석 함수를 확인하세요. 프로세스별 설정 차이도 확인해야 합니다.</p>
+<details class="section section-2" id="genos_a2a_cooperative_agent_ids"><summary><span role="heading" aria-level="2">GENOS_A2A_COOPERATIVE_AGENT_IDS</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/utils/buildAgentflow.ts">buildAgentflow.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_a2a_cooperative_pause"><summary><span role="heading" aria-level="2">GENOS_A2A_COOPERATIVE_PAUSE</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/utils/buildAgentflow.ts">buildAgentflow.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_agentflow_node_log"><summary><span role="heading" aria-level="2">GENOS_AGENTFLOW_NODE_LOG</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/utils/buildAgentflow.ts">buildAgentflow.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_agentflow_trace_join"><summary><span role="heading" aria-level="2">GENOS_AGENTFLOW_TRACE_JOIN</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/handler.ts">handler.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_boot_migrations"><summary><span role="heading" aria-level="2">GENOS_BOOT_MIGRATIONS</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/DataSource.ts">DataSource.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/genosRuntime.ts">genosRuntime.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/index.ts">index.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_checkpoint_ttl_sec"><summary><span role="heading" aria-level="2">GENOS_CHECKPOINT_TTL_SEC</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/utils/genosSubjectScope.ts">genosSubjectScope.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_dev_token"><summary><span role="heading" aria-level="2">GENOS_DEV_TOKEN</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/agentflow/Agent/Agent.ts">Agent.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/agentflow/GenosA2A/GenosA2A.ts">GenosA2A.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/agentflow/MncRerankAgentflow/MncRerankAgentflow.ts">MncRerankAgentflow.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/agentflow/MonimoAgent/MonimoAgent.ts">MonimoAgent.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/chatmodels/ChatMnc/ChatMnc.ts">ChatMnc.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/embeddings/MncOpenAIEmbedding/MncOpenAIEmbedding.ts">MncOpenAIEmbedding.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/retrievers/MncRerankRetriever/MncRerankRetriever.ts">MncRerankRetriever.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/tools/GenOSMemory/GenOSLongTermMemory.ts">GenOSLongTermMemory.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/tools/MCP/GenosMCP/GenosMCP.ts">GenosMCP.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/vectorstores/DeepSearfing/SkillPipeline.ts">SkillPipeline.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/services/nodes/index.ts">index.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_llm_max_retries"><summary><span role="heading" aria-level="2">GENOS_LLM_MAX_RETRIES</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosLlmDefaults.ts">genosLlmDefaults.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_llm_timeout_ms"><summary><span role="heading" aria-level="2">GENOS_LLM_TIMEOUT_MS</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosLlmDefaults.ts">genosLlmDefaults.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_overlay_rev"><summary><span role="heading" aria-level="2">GENOS_OVERLAY_REV</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/genosRuntime.ts">genosRuntime.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_python_bin"><summary><span role="heading" aria-level="2">GENOS_PYTHON_BIN</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/utils.ts">utils.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_secfilter_mode"><summary><span role="heading" aria-level="2">GENOS_SECFILTER_MODE</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/agentflow/Retriever/Retriever.ts">Retriever.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/tools/RetrieverTool/RetrieverTool.ts">RetrieverTool.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/skillBodyAccess.ts">skillBodyAccess.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/utils/buildAgentflow.ts">buildAgentflow.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_shared_schema_guard"><summary><span role="heading" aria-level="2">GENOS_SHARED_SCHEMA_GUARD</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/genosRuntime.ts">genosRuntime.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/routes/index.ts">index.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_skill_search_cache_max_mb"><summary><span role="heading" aria-level="2">GENOS_SKILL_SEARCH_CACHE_MAX_MB</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/skillSearchCache.ts">skillSearchCache.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_skill_search_cache_ttl_ms"><summary><span role="heading" aria-level="2">GENOS_SKILL_SEARCH_CACHE_TTL_MS</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/skillSearchCache.ts">skillSearchCache.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_skill_search_max_per_turn"><summary><span role="heading" aria-level="2">GENOS_SKILL_SEARCH_MAX_PER_TURN</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/skillGate.ts">skillGate.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_skill_select_would_hit_ttl_ms"><summary><span role="heading" aria-level="2">GENOS_SKILL_SELECT_WOULD_HIT_TTL_MS</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/skillSelectorMode.ts">skillSelectorMode.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_stock_llm_traceparent"><summary><span role="heading" aria-level="2">GENOS_STOCK_LLM_TRACEPARENT</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosTrace.ts">genosTrace.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_stream_executed_data"><summary><span role="heading" aria-level="2">GENOS_STREAM_EXECUTED_DATA</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/utils/toClientExecution.ts">toClientExecution.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_test_system_receipts"><summary><span role="heading" aria-level="2">GENOS_TEST_SYSTEM_RECEIPTS</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/testSystemReceipt.ts">testSystemReceipt.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_workflow_edit_lock"><summary><span role="heading" aria-level="2">GENOS_WORKFLOW_EDIT_LOCK</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/routes/index.ts">index.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="genos_workflow_id"><summary><span role="heading" aria-level="2">GENOS_WORKFLOW_ID</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/storage/S3StorageProvider.ts">S3StorageProvider.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/genos-oss/utils/ControllerServiceUtils.ts">ControllerServiceUtils.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/server/src/genosRuntime.ts">genosRuntime.ts</a></li>
+</ul>
+</div></details><details class="section section-2" id="skills_policy_enabled"><summary><span role="heading" aria-level="2">SKILLS_POLICY_ENABLED</span></summary><div class="section-body">
+<ul>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/vectorstores/DeepSearfing/DeepSearfing.ts">DeepSearfing.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/vectorstores/DeepSearfing/SkillPipeline.ts">SkillPipeline.ts</a></li>
+<li><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/skillBodySources.ts">skillBodySources.ts</a></li>
+</ul></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/environment.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

@@ -1,0 +1,47 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>체인 실행 경로 데모</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../assets/style.css"><body class="demo"><div id="chain-lesson">
+  <div class="viz-controls">
+    <label class="form-label">진행 경로
+      <select class="form-select" id="chain-path">
+        <option value="approve">선택 후 승인</option>
+        <option value="reject">선택 후 거절</option>
+        <option value="unknown">없는 ID 제출 후 재시도</option>
+      </select>
+    </label>
+    <button class="btn" type="button" id="chain-back">이전 단계</button>
+    <button class="btn btn-primary" type="button" id="chain-next">다음 단계</button>
+  </div>
+  <ol class="chain-lane" aria-label="실행 경로">
+    <li data-phase="0">도구 결과</li><li data-phase="1">선택</li><li data-phase="2">확인</li><li data-phase="3">다음 도구</li>
+  </ol>
+  <div aria-live="polite"><p id="chain-status"></p><pre><code id="chain-data"></code></pre></div>
+</div>
+<style>
+#chain-lesson .chain-lane{display:flex;flex-wrap:wrap;gap:12px;padding:0;list-style:none;margin:20px 0}
+#chain-lesson .chain-lane li{padding:8px 12px;background:color-mix(in srgb,var(--foreground) 5%,transparent);color:var(--foreground)}
+#chain-lesson .chain-lane li.current{background:color-mix(in srgb,var(--viz-series-1) 18%,transparent)}
+#chain-lesson pre{white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:0;color:var(--foreground)}
+</style>
+<script>
+(()=>{
+ const root=document.getElementById('chain-lesson'),path=root.querySelector('#chain-path'),back=root.querySelector('#chain-back'),next=root.querySelector('#chain-next');
+ const rows=[{id:'a1',label:'생활 계좌',account:'DEMO-A'},{id:'a2',label:'저축 계좌',account:'DEMO-B'}];
+ const make=(choice)=>[
+  {phase:0,label:'lookup_accounts가 후보와 genosChain을 반환합니다. 서버는 모델에 보여줄 결과에서 체인 선언을 제거합니다.',data:{payload:{accounts:rows},serverDirective:{steps:['pick','approve'],onSuccess:'use_account'}}},
+  ...(choice==='unknown'?[{phase:1,label:'없는 ID는 거절합니다. 다음 도구는 실행하지 않고, 선택 관문은 응답 수정을 기다립니다.',data:{submitted:{selected:['unknown']},joinedRow:null,successorCalled:false}}]:[]),
+  {phase:1,label:'서버가 a1을 원본 행과 연결합니다. 라벨과 계좌값은 그 행에서 가져옵니다.',data:{answer:{selected:['a1']},selected:rows[0]}},
+  {phase:2,label:'확인은 응답을 기다리는 단계입니다. 아직 업무 도구는 실행하지 않았습니다.',data:{component:'confirm',prompt:'생활 계좌를 사용할까요?',completedSteps:{pick:{answer:{selected:['a1']},selected:rows[0]}}}},
+  choice==='reject'?{phase:3,label:'거절하면 onFailure에서 중단합니다. use_account는 호출하지 않습니다.',data:{answer:{selected:[false]},branch:'onFailure',stop:true,successorCalled:false}}:
+  {phase:3,label:'승인하면 서버가 완료된 pick 단계의 결과로 다음 도구의 인자를 구성합니다.',data:{answer:{selected:[true]},branch:'onSuccess',call:{tool:'use_account',args:{account:'DEMO-A'}}}}
+ ];
+ let state={path:'approve',step:0};
+ const valid=(v)=>v&&['approve','reject','unknown'].includes(v.path)&&Number.isInteger(v.step)?{path:v.path,step:Math.max(0,Math.min(v.step,make(v.path).length-1))}:{path:'approve',step:0};
+ const draw=()=>{path.value=state.path;const steps=make(state.path),item=steps[state.step];root.querySelector('#chain-status').textContent=item.label;root.querySelector('#chain-data').textContent=JSON.stringify(item.data,null,2);root.querySelectorAll('[data-phase]').forEach(el=>{el.classList.toggle('current',Number(el.dataset.phase)===item.phase);if(Number(el.dataset.phase)===item.phase)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});back.disabled=state.step===0;next.disabled=state.step===steps.length-1;};
+ const save=()=>window.openai?.setWidgetState?.({modelContent:{demo:'chain',...state},privateContent:null}).catch(()=>{});
+ state=valid(window.openai?.widgetState?.modelContent);draw();
+ path.addEventListener('change',()=>{state={path:path.value,step:0};draw();save()});
+ back.addEventListener('click',()=>{state.step=Math.max(0,state.step-1);draw();save()});
+ next.addEventListener('click',()=>{state.step=Math.min(make(state.path).length-1,state.step+1);draw();save()});
+ window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState){state=valid(e.detail.globals.widgetState.modelContent);draw();}});
+})();
+</script>
+</body></html>

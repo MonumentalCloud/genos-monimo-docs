@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>genos-slots · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="slots"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group" open><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group"><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group"><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group"><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group"><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>genos-slots</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>현재 시스템 프롬프트나 선언된 스킬 내용에 있는 <code>genos-slots</code> 코드 블록으로 절차를 정의합니다. 에이전트는 없는 값을 질문하고, 후보·검증도구를 호출한 뒤 <code>slot_fill</code>로 값을 명시적으로 확정합니다. 필요한 모든 슬롯에 유효한 최신 검증 근거가 있어야 입구도구가 열립니다. 선언은 엔진이 파싱하고 일반 모델 문구에서는 제거합니다.</p>
+<details class="section section-2" id="_1"><summary><span role="heading" aria-level="2">설정 화면</span></summary><div class="section-body">
+<details class="section section-3" id="_2"><summary><span role="heading" aria-level="3">스킬 경로를 쓰는 경우</span></summary><div class="section-body">
+<p><strong>모니모 Agent → 설정 → 스킬 선언과 검색</strong>에서 <strong>스킬 선언 필수·노드 내 스킬 검색·스킬 DB</strong>를 확인하세요. 스킬 문서로 절차를 제공한다면 해당 문서가 검색·선언되는 경로를 연결합니다.</p>
+<figure><a href="assets/monimo-slot-settings.jpg" target="_blank" rel="noopener"><span class="crop" style="aspect-ratio:600.0/655.0"><img src="assets/monimo-slot-settings.jpg" alt="모니모 Agent의 스킬 선언과 검색 설정" style="width:245.0%;left:-72.5%;top:-4.885496183206107%" loading="lazy"></span></a><figcaption>모니모 Agent의 스킬 선언과 검색 설정 · 눌러 원본 보기</figcaption></figure>
+
+<p><strong>확인할 항목:</strong> <strong>스킬 선언 필수 = 사용 안 함</strong>인 노드는 스킬 검색·선언·슬롯 실행에 참여하지 않습니다. <strong>자동</strong>과 <strong>항상 필수</strong>는 플로우 구성에 맞게 고르세요. 이 옵션은 슬롯값을 입력하는 칸이 아닙니다.</p>
+</div></details><details class="section section-3" id="_3"><summary><span role="heading" aria-level="3">노드 지침에 직접 선언하는 경우</span></summary><div class="section-body">
+<p><strong>모니모 Agent → 프롬프트 → 메시지</strong>에서 역할을 <strong>시스템 (system)</strong> 으로 지정하고 <strong>내용</strong>에 <code>genos-slots</code> 코드 블록을 넣습니다. 스킬 문서에 선언한다면 노드에 같은 절차를 중복해서 넣을 필요가 없습니다.</p>
+<figure><a href="assets/monimo-slot-prompt.jpg" target="_blank" rel="noopener"><span class="crop" style="aspect-ratio:900.0/655.0"><img src="assets/monimo-slot-prompt.jpg" alt="프롬프트 탭의 시스템 메시지와 genos-slots 선언 위치" style="width:163.33333333333334%;left:-31.666666666666668%;top:-4.885496183206107%" loading="lazy"></span></a><figcaption>프롬프트 탭의 시스템 메시지와 genos-slots 선언 위치 · 눌러 원본 보기</figcaption></figure>
+
+<p><strong>확인할 항목:</strong> 선언은 시스템 지침이나 선언된 스킬 내용에 둡니다. <strong>입력 메시지</strong>나 사용자의 채팅에 붙이는 것이 아닙니다. 프롬프트 아래 <strong>내부 도구 설명 → slot_fill</strong>은 모델이 읽는 설명을 편집하는 곳이며, 절차 선언을 넣는 곳과 다릅니다. 지침을 수정한 뒤에는 워크플로우를 저장해야 실행에 반영됩니다.</p>
+</div></details></div></details><details class="section section-2" id="_4"><summary><span role="heading" aria-level="2">데모로 검증과 잠금 확인하기</span></summary><div class="section-body">
+<p>아무 값도 확정하지 않은 상태에서 입구도구를 호출해 보세요. 그다음 각 슬롯을 검증하고 확정하세요. 계좌를 다시 검증하면 금액도 재검증해야 하는 이유를 확인할 수 있습니다. 검증도구 호출은 근거를 기록하고, <code>slot_fill</code>은 그 근거로 값을 확정합니다.</p>
+<iframe class="demo-frame" title="슬롯 검증과 입구도구 잠금 데모" src="demos/slots.html" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+<p class="caption">합성 동작 데모 · 실제 도구 호출 없음 · <a href="demos/slots.html" target="_blank" rel="noopener">크게 열기</a></p>
+
+</div></details><details class="section section-2" id="_5"><summary><span role="heading" aria-level="2">절차 선언하기</span></summary><div class="section-body">
+<p>아래 키는 파서가 읽는 실제 키이므로 한국어 이름을 유지하세요. <code>입력포맷</code>과 <code>검증인자</code>는 각각 한 줄짜리 JSON 객체로 작성해야 합니다.</p>
+<pre><code class="language-genos-slots">절차: DemoTransfer
+입구도구: prepare_transfer
+입력포맷: {&quot;qvo&quot;:{&quot;account&quot;:&quot;$슬롯.계좌.account&quot;,&quot;amount&quot;:&quot;$슬롯.금액&quot;}}
+- 슬롯: 계좌
+  질문: 어느 계좌를 사용할까요?
+  후보도구: lookup_accounts
+  검증도구: verify_account
+  값스키마: {&quot;account&quot;:&quot;string&quot;,&quot;bank&quot;:&quot;string&quot;}
+  검증인자: {&quot;account&quot;:&quot;$value.account&quot;,&quot;bank&quot;:&quot;$value.bank&quot;}
+- 슬롯: 금액
+  질문: 금액은 얼마인가요?
+  검증도구: verify_amount
+  값스키마: number
+  검증인자: {&quot;amount&quot;:&quot;$value&quot;,&quot;account&quot;:&quot;$슬롯.계좌.account&quot;}
+</code></pre>
+<p>이 예제는 검증도구가 최상위 <code>account</code>, <code>bank</code>, <code>amount</code> 인자를 받고, 입구도구는 <code>qvo</code>로 감싼 인자를 받는다고 가정합니다. 금액 검증 인자에서 계좌 슬롯을 참조하므로 금액은 계좌에 의존합니다. 계좌를 바꾸거나 다시 검증하면 금액의 승인도 무효화됩니다.</p>
+</div></details><details class="section section-2" id="_6"><summary><span role="heading" aria-level="2">실제 호출 순서</span></summary><div class="section-body">
+<ol>
+<li>
+<p>에이전트가 <code>lookup_accounts</code>를 일반 도구로 호출합니다. 해당 도구의 입력 스키마를 따릅니다. 이 브랜치에서는 새 <code>slot_options</code> 호출을 사용하지 않습니다.</p>
+</li>
+<li>
+<p>선택한 객체의 필드로 <code>verify_account</code>를 호출합니다. 일반적인 응답은 <code>{"success":true,"payload":{"mcpSuccess":true,"mcpMessage":"승인됨"}}</code>입니다. <code>payload.mcpSuccess</code>는 boolean이어야 하며, 최상위 <code>success</code>만으로는 검증 통과가 아닙니다. 이전 <code>{ok:true, feedback:..., value:...}</code> 형식도 읽습니다.</p>
+</li>
+<li>
+<p>에이전트가 검증 결과 전체를 읽고 <code>slot_fill({slot:"계좌",value:{account:"DEMO-A",bank:"예제 은행"}})</code>을 호출합니다. ID만으로 후보 객체를 복원하지 않습니다.</p>
+</li>
+<li>
+<p>현재 계좌를 기준으로 금액을 검증한 뒤 <code>slot_fill({slot:"금액",value:50000})</code>을 호출합니다.</p>
+</li>
+<li>
+<p>모든 슬롯이 유효한 근거와 함께 확정되면 <code>prepare_transfer</code>를 실행할 수 있습니다. 인자는 서버의 슬롯 상태와 선언한 <code>입력포맷</code>으로 구성합니다.</p>
+</li>
+</ol>
+<p>여러 절차가 열려 있으면 <code>slot_fill</code>에 <code>procedure</code>도 필요합니다. 검증도구 호출은 근거만 기록하며 슬롯을 자동으로 채우지 않습니다. <code>slot_fill</code>은 그 근거로 확정할 뿐, 검증도구를 대신 호출하지 않습니다.</p>
+</div></details><details class="section section-2" id="_7"><summary><span role="heading" aria-level="2">기술 사양과 주의사항</span></summary><div class="section-body">
+<details class="section section-3" id="_8"><summary><span role="heading" aria-level="3">스키마와 인자 규칙</span></summary><div class="section-body">
+<table>
+<thead>
+<tr>
+<th>선언</th>
+<th>현재 규칙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>질문</code></td>
+<td>에이전트가 참고할 문구. 실제 질문·카드 문구는 모델이 작성</td>
+</tr>
+<tr>
+<td><code>후보도구</code></td>
+<td>선택적 조회 도구. 현재는 이를 지정하면 검증도구도 필요</td>
+</tr>
+<tr>
+<td><code>검증도구</code></td>
+<td>직접 입력 슬롯에서는 생략 가능. 생략하면 별도 업무 검증 없이 값 확정 가능</td>
+</tr>
+<tr>
+<td><code>값스키마</code></td>
+<td><code>string</code>, <code>number</code>, 또는 <code>string</code>·<code>number</code>·<code>boolean</code> 필드로 구성한 평면 객체</td>
+</tr>
+<tr>
+<td><code>검증인자</code></td>
+<td><code>$value</code>, <code>$value.field</code>, <code>$슬롯.&lt;name&gt;[.&lt;field&gt;]</code>로 검증 인자 매핑</td>
+</tr>
+<tr>
+<td><code>입력포맷</code></td>
+<td><code>$슬롯</code>, <code>$슬롯.&lt;name&gt;</code>, 필드 경로로 입구 JSON 구성. <code>$$...</code>는 문자 그대로의 <code>$</code> 시작값</td>
+</tr>
+</tbody>
+</table>
+<p><code>입력포맷</code>이 없으면 객체 슬롯의 필드를 한 단계 펼쳐 입구 인자를 만듭니다. 같은 필드에 서로 다른 값이 있으면 <code>SLOT_INPUT_KEY_CONFLICT</code>로 거절합니다. 포맷을 지정하면 중첩 구조와 <code>qvo</code>를 직접 정합니다. 슬롯은 체인의 자동 감싸기 규칙을 물려받지 않습니다.</p>
+</div></details><details class="section section-3" id="_9"><summary><span role="heading" aria-level="3">예상과 다를 수 있는 동작</span></summary><div class="section-body">
+<ul>
+<li>
+<p>검증을 시도할 때마다 호출 전에 해당 슬롯의 이전 승인을 취소합니다. 통신 실패도 예외가 아니며, 의존 슬롯의 승인도 무효화됩니다. 새 검증이 성공한 뒤에도 다시 명시적으로 확정해야 합니다.</p>
+</li>
+<li>
+<p>캐시에 남은 이전 승인값으로 최신 검증 결과를 대신할 수 없습니다. 값만 있고 검증 근거가 없는 이전 체크포인트에서는 입구도구가 잠긴 상태로 유지됩니다.</p>
+</li>
+<li>
+<p>단일 값의 <code>number</code>는 현재 숫자로 읽을 수 있는 음수 아닌 정수 금액입니다. 쉼표와 앞뒤 공백은 정리할 수 있지만 음수와 소수는 확정되지 않습니다. 범용 숫자 스키마가 아닙니다. 객체 필드의 <code>number</code>는 별도의 필드 타입 검사를 따릅니다.</p>
+</li>
+<li>
+<p>객체 슬롯에는 선언한 필드가 필요합니다. ID로 객체를 조회하지 않으며, 공개 <code>slot_fill</code> 스키마는 임의의 중첩 객체를 지원하지 않습니다.</p>
+</li>
+<li>
+<p>열린 슬롯마다 검증도구의 소유 관계가 유일해야 합니다. 여러 슬롯에 같은 검증도구 이름을 쓰면 <code>SLOT_VALIDATOR_CONFLICT</code>가 발생합니다.</p>
+</li>
+<li>
+<p>이 브랜치에서 작성자가 선언한 <code>검증인자</code>는 최상위 참조만 복원합니다. 중첩 <code>qvo</code> 안에 <code>$value</code>나 <code>$슬롯.계좌.account</code>를 넣으면 복원하거나 의존 관계를 등록하지 않습니다. 모델이 넘기는 <code>verify_args</code>는 별도의 재귀 처리 경로를 사용합니다. 여기서는 최상위 매핑을 사용하세요. 입구 인자의 재귀 <code>입력포맷</code>은 별도로 지원합니다.</p>
+</li>
+<li>
+<p><code>검증인자</code>의 고정 상수는 현재 정확한 일치 조건이 아니라 안내로 취급합니다. 예를 들어 <code>limit:100</code>을 선언해도 <code>limit:99</code>로 호출한 검증이 성공하면 받아들일 수 있습니다. 참조값과 의존 관계는 별도로 검사합니다. 이 차이가 해결되기 전에는 검증도구에서 업무 제약을 강제하세요.</p>
+</li>
+<li>
+<p><code>request_user_input</code>으로 묻는 것과 <code>slot_fill</code>로 확정하는 것은 별개입니다. 에이전트는 대화에 이미 나온 값을 다시 묻지 않고 사용할 수 있습니다. 본문으로만 질문하면 턴이 끝나며, 같은 턴의 카드 결과가 생기지는 않습니다.</p>
+</li>
+<li>
+<p>슬롯 캐시 TTL은 30분이며 저장할 때 갱신합니다. 입구도구 성공 뒤에도 같은 과업에서 값을 수정할 수 있습니다. 수정·재검증·중복 호출·이전 승인 무효화 규칙은 아래 수명주기 절을 보세요. 워크플로우 FINISHED에서 과업을 해제하며 STOPPED의 응답 대기는 유지합니다. 상태 만료가 대화 이력을 지우지는 않습니다.</p>
+</li>
+</ul>
+<p><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/slotEngine.ts">슬롯 파서와 처리기</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/tests/slot_agentic_validation.test.mjs">검증 근거 사례</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/slotStore.ts">슬롯 저장소</a>.</p>
+</div></details></div></details><details class="section section-2" id="_10"><summary><span role="heading" aria-level="2">선언 문법과 입력포맷의 세부 규칙</span></summary><div class="section-body">
+<p>절차마다 <code>절차</code>, <code>입구도구</code>와 하나 이상의 <code>슬롯</code>을 씁니다. 슬롯은 질문·후보도구·검증도구·값스키마·검증인자를 가질 수 있습니다. 후보도구를 선언하면 검증도구가 필수이며 없으면 <code>CANDIDATE_VERIFIER_REQUIRED</code>입니다. 동시에 열린 절차에서 한 검증도구를 여러 슬롯이 공유하면 <code>SLOT_VALIDATOR_CONFLICT</code>입니다.</p>
+<p>입력포맷은 한 줄 JSON 객체입니다. <code>$슬롯</code> 전체, <code>$슬롯.&lt;이름&gt;</code>, 중첩 필드와 <code>.0</code> 인덱스를 참조할 수 있습니다. 고정 JSON 값과 배열도 허용하며 타입을 보존합니다. <code>$</code>로 시작하는 고정 문자열은 <code>$$</code>로 씁니다. 문자열 안의 부분 보간·JavaScript 계산·반복 변환은 지원하지 않습니다. 참조가 없으면 추측하거나 생략하지 않고 실패합니다.</p>
+<table>
+<thead>
+<tr>
+<th>원하는 인자</th>
+<th>입력포맷</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>슬롯 전체를 qvo로</td>
+<td><code>{"qvo":"$슬롯"}</code></td>
+</tr>
+<tr>
+<td>계좌 객체만 qvo로</td>
+<td><code>{"qvo":"$슬롯.계좌"}</code></td>
+</tr>
+<tr>
+<td>원래 슬롯 구조 유지</td>
+<td><code>{"계좌":"$슬롯.계좌","금액":"$슬롯.금액"}</code></td>
+</tr>
+<tr>
+<td>이름 변경과 고정값</td>
+<td><code>{"amount":"$슬롯.금액","currency":"KRW"}</code></td>
+</tr>
+<tr>
+<td>인자 없는 호출</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p>생략 시 객체 슬롯을 한 단계 펼치며 스칼라·배열·null은 슬롯 이름을 유지합니다. 중복 키의 값이 같으면 합치고 다르면 SLOT_INPUT_KEY_CONFLICT입니다. 일반 체인의 자동 qvo 감싸기와 구분합니다.</p>
+</div></details><details class="section section-2" id="_11"><summary><span role="heading" aria-level="2">검증 근거를 읽는 방법</span></summary><div class="section-body">
+<p>후보·검증도구는 자신의 원래 스키마로 모델이 직접 호출합니다. qvo가 필수면 빈 조회도 <code>{"qvo":{}}</code>로 보내야 합니다. slot_options는 사용하지 않습니다. 후보 결과의 전체 객체를 읽고 선택한 객체를 slot_fill에 보냅니다. 후보 ID만으로 서버가 원본을 찾아 주거나 후보 목록 소속 여부를 자동으로 보장하지 않습니다.</p>
+<p>검증 Input 또는 응답 payload의 같은 이름 정규화 필드와 채울 값을 대조합니다. 응답이 있다고 자동 병합하지 않으며 입력값과 정규화값 중 무엇을 확정할지는 에이전트가 선택합니다. 양쪽 어디에도 없는 값은 승인하지 않습니다. 별도 이름 매핑은 검증인자 또는 verify_args로 연결합니다. 작성한 검증인자의 고정 상수는 호출 안내이며 추가 승인 조건으로 강제되지 않는 현재 제한이 있습니다.</p>
+<p>검증 시작 시 해당 슬롯과 의존 슬롯의 승인을 취소합니다. 같은 인자를 다시 검증해도 실제 도구를 다시 호출합니다. 실패·예외·규격 불명확 후에는 과거 성공을 재사용할 수 없습니다. 검증 성공 뒤에도 slot_fill이 필요합니다.</p>
+</div></details><details class="section section-2" id="_12"><summary><span role="heading" aria-level="2">실행 후 값 수정과 승인 무효화</span></summary><div class="section-body">
+<p>최신 브랜치에서는 입구도구 성공 뒤에도 같은 과업에서 slot_fill로 수정할 수 있습니다. 수정 자체가 입구도구를 실행하지는 않습니다. 새 검증·확정을 마친 뒤 모델이 명시적으로 입구도구를 다시 호출해야 합니다.</p>
+<p>같은 인자로 연달아 호출하면 SLOT_ENTRY_ALREADY_EXECUTED입니다. 값을 바꾸면 그 실행에서 나온 대기 승인·브릿지가 무효화됩니다. 예전 액션을 재개하면 SLOT_CONTINUATION_INVALIDATED이며 후속 도구를 실행하지 않습니다. 이미 시작된 외부 작업을 취소하거나 되돌리는 보장은 아닙니다.</p>
+<p>잘못된 카드 답변은 승인 토큰을 소모하지 않으므로 수정해 다시 제출할 수 있습니다. 거절 분기가 새 승인·브릿지를 만들면 그 흐름을 마친 뒤 절차를 닫습니다. 일반 genos-chain과 독립 HITL·브릿지의 동작을 이 슬롯 정책으로 바꾸지는 않습니다.</p>
+</div></details><details class="section section-2" id="_13"><summary><span role="heading" aria-level="2">취소와 완료와 재개</span></summary><div class="section-body">
+<p>워크플로우 FINISHED에서 실행이 저장한 열린 과업과 선언·허용 목록을 해제합니다. 한 Agent 노드의 응답 반환만으로 전체 과업을 닫지 않습니다. STOPPED 상태의 입력·승인 카드는 유지합니다. 새 실행이 더 최신 상태를 저장했으면 예전 실행의 종료가 이를 지우지 않습니다. ERROR·TERMINATED의 보관은 기존 정책을 따릅니다.</p>
+<p>Redis 복원과 checkpoint claim은 기존 상태·owner·revision을 사용합니다. 중복·오래된 액션 방어를 전역 exactly-once 보장으로 해석하지 않습니다. 전송 timeout 뒤 업무 결과가 불명확하면 임의 재시도 전에 실제 업무 상태를 확인해야 합니다.</p>
+</div></details><details class="section section-2" id="_14"><summary><span role="heading" aria-level="2">이전 스킬에서 전환할 때</span></summary><div class="section-body">
+<p>후보도구에는 검증도구를 추가하세요. 예전 자동 qvo 합성에 의존했다면 입력포맷을 명시하세요. 구버전 대화의 봉인 목록은 출처를 구분할 수 없어 자동 해제하지 않으므로 새 대화가 필요할 수 있습니다. 진행 중 checkpoint도 새 기본 인자 규칙을 적용받을 수 있어 배포 전 재개 경로를 확인해야 합니다.</p>
+<p>근거: <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/docs/agentic-slot-candidates.md">agentic-slot-candidates.md</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/docs/slot-entry-args.md">slot-entry-args.md</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/slot-edit-after-entry.md">slot-edit-after-entry.md</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/skill-task-completion.ko.md">skill-task-completion.ko.md</a>.</p></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/slots.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

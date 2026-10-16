@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>운영과 호환성 · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="operations"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group"><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group"><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group"><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group" open><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group"><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>운영과 호환성</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>아래 항목은 호환성에 영향을 주는 현재 동작입니다. 이 차이에 맞춰 플로우를 설계하라는 뜻은 아닙니다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>작성 의도 또는 기대 규칙</th>
+<th>현재 구현</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>한 체인 분기에 <code>stop:true</code>와 <code>tool</code> 함께 지정</td>
+<td>이 조합을 작성하지 않음. 들어오면 즉시 중단</td>
+<td>파서가 허용하고 <code>runChain</code>이 지정 도구와 후속 체인을 실행할 수 있음. 중단·도구 분기를 분리해야 함</td>
+</tr>
+<tr>
+<td>슬롯 <code>number</code></td>
+<td>작성자의 용도에 맞는 숫자 처리</td>
+<td>단일 값은 음수 아닌 정수 금액으로 제한</td>
+</tr>
+<tr>
+<td>검증 인자 상수</td>
+<td>작성자가 정한 제약을 유지</td>
+<td>성공한 검증 호출의 고정값이 선언과 달라도 통과 가능</td>
+</tr>
+<tr>
+<td>문구 없는 네이티브 브릿지</td>
+<td>의도한 빈 프롬프트 유지</td>
+<td>마스터 위임 경로에서 기본 안내 문구로 대체될 수 있음</td>
+</tr>
+<tr>
+<td>이전 confirm 문자열</td>
+<td>확인은 boolean 결정</td>
+<td>일부 호환 경로가 문자열 boolean을 허용하며, 텍스트와 구조화된 A2A 결정 변환이 다를 수 있음</td>
+</tr>
+</tbody>
+</table>
+<p><code>stop</code>과 <code>tool</code>의 규칙은 이 가이드를 작성하면서 Marvin이 확인했습니다. 나머지는 현재 기본 동작 리뷰에 기록된 차이이며, 호환성을 유지하는 동안 알아두어야 할 항목입니다. 이 문서는 실행 동작을 변경하지 않습니다.</p>
+<details class="section section-2" id="_1"><summary><span role="heading" aria-level="2">버전과 검증 범위</span></summary><div class="section-body">
+<p>아직 반영되지 않은 Vault 후속 <a href="https://github.com/genonai/GenOS/pull/23511">PR #23511</a>에는 원시 타입 정의, 인라인 중첩, 수명·개인정보 처리 수정이 포함됩니다. 해당 스키마를 이 가이드의 기준 버전에 그대로 복사하면 안 됩니다. 기준 버전의 정의 검증기는 <code>valueType</code>과 인라인 필드 정의를 거절합니다. 브랜치 병합과 배포 이미지 교체도 별개입니다.</p>
+<p>실제 플로우에서는 배포된 정확한 버전을 확인하고, 에이전트의 도구 호출부터 사용자에게 보이는 결과까지 전체 경로를 점검하세요. 승인·거절·알 수 없는 ID·취소·검증 실패·재시도·체크포인트 재개를 포함해야 합니다. 실제 후속 인자와 최종 업무 결과를 확인하고, 뒤 단계가 실패해도 완료된 작업을 반복하지 않는지 보세요. Vault는 사용할 수 없는 참조, 표시 복원, 이후 대화 이력까지 확인하세요.</p>
+<p>이 인터랙티브 데모는 기능 규칙을 설명합니다. 해당 배포 환경의 실제 모델 동작, 네이티브 GenPortal 브라우저 동작, 프로덕션 빌드 성공, 운영 추적 데이터 저장을 검증한 것은 아닙니다.</p>
+</div></details><details class="section section-2" id="_2"><summary><span role="heading" aria-level="2">반복 횟수와 공개 오류 안내</span></summary><div class="section-body">
+<p>Max Iterations는 도구 호출과 필수 스킬 결정 재시도의 라운드 한도입니다. 미설정·0은 무제한입니다. 처리 단계 한도 안내 문구는 앞뒤 공백 제거 후 최대 2,000자이며 비면 기본 안내를 씁니다. AGENT_ITERATION_LIMIT 실패를 유지하고 검증된 publicError의 code·message만 사용자·마스터에 전달합니다.</p>
+<p>한도에서 유효한 HITL 카드가 있으면 먼저 카드를 표시하고 나머지는 응답까지 대기합니다. 취소·잘못된 응답에서는 대기 도구를 실행하지 않으며 재개 뒤 라운드는 기존 방식으로 새로 계산합니다. 일반 최종 답변·빈 답변·브릿지의 빈 대기 문구를 한도 안내로 바꾸지 않습니다. 기본 Agent와 genos-chain의 한도 정책은 별도입니다.</p>
+</div></details><details class="section section-2" id="_3"><summary><span role="heading" aria-level="2">저장과 큐와 실행 이력</span></summary><div class="section-body">
+<p>Flowise 서버의 agentflow runner, checkpoint, A2A 협력 실행, BullMQ 응답, 메시지 저장·표시 경로도 변경 범위입니다. 큐 작업이 completed인 것과 업무 워크플로우가 성공한 것은 다를 수 있습니다. 실패 봉투를 풀고 실제 실행 상태·최종 출력·메트릭을 확인해야 합니다.</p>
+<p>모델용 본문과 사용자 표시 본문은 구분해서 저장할 수 있습니다. Vault는 모델 이력에 발급 참조를 유지하고 사용자가 볼 때 복원하므로 이전 대화가 비어 보이는 문제를 단순 모델 생성 실패로 단정하지 마세요. 스키마 변경과 배포 이미지, 진행 중 checkpoint의 호환성을 함께 확인합니다.</p>
+</div></details><details class="section section-2" id="_4"><summary><span role="heading" aria-level="2">문서를 갱신하는 방법</span></summary><div class="section-body">
+<p>이 사이트의 content/*.md가 게시 원본입니다. 내용을 수정한 뒤 build.py를 실행하고 변경 파일을 GitHub Pages 게시 브랜치에 push하면 사이트를 갱신할 수 있습니다. GitHub 설정은 Settings → Pages → Deploy from a branch → main → /(root)를 사용할 수 있습니다. .nojekyll과 index.html을 루트에 유지하세요.</p>
+<p>ChatGPT Page를 수정한다고 GitHub 저장소가 자동으로 동기화되지는 않습니다. Page 수정본을 반영하려면 내용을 게시 원본으로 옮겨 빌드·push합니다. 소스 브랜치가 바뀌면 기준 커밋·변경 색인·설정 사전·데모와 화면을 함께 갱신해야 합니다. 동작을 바꾼 커밋을 목록에만 추가하고 예전 설명을 남기지 않습니다.</p>
+</div></details><details class="section section-2" id="_5"><summary><span role="heading" aria-level="2">게시와 검증의 경계</span></summary><div class="section-body">
+<p>공개 사이트는 정적 문서·합성 데모만 실행하며 운영 도구나 개인 데이터를 조회하지 않습니다. GitHub 소스 링크는 해당 비공개 저장소 권한이 있어야 열릴 수 있지만 문서 본문·화면·데모는 사이트에 포함됩니다. 문서 서버의 브라우저 확인은 GenOS의 실모델·네이티브 앱·운영 Langfuse 적재 검증을 대신하지 않습니다.</p>
+<p>근거: <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/docs/a2a/monimo-iteration-limit.md">monimo-iteration-limit.md</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/toolFailure.ts">toolFailure.ts</a>.</p></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/operations.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

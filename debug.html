@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Langfuse 디버깅 · Monimo 커스터마이징</title><meta name="description" content="Monimo v1.9.3.4 Flowise 커스터마이징 한국어 사용법과 기술 명세"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
+<body data-current="debug"><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="index.html">Monimo <span>커스터마이징</span></a><button id="nav-toggle" aria-expanded="false" aria-controls="site-nav">목차</button><form id="site-search" role="search"><label for="search">문서 검색</label><input id="search" type="search" placeholder="기능·설정·오류 코드" autocomplete="off"><button type="submit">검색</button></form></header>
+<div id="search-panel" hidden><div class="search-top"><strong>검색 결과</strong><button id="close-search">닫기</button></div><p id="search-status" role="status"></p><ul id="search-results"></ul></div>
+<aside id="site-nav"><p class="nav-heading">FLOWISE · MONIMOAGENT</p><details class="nav-group"><summary>시작과 스킬</summary><a href="index.html" data-page="index">시작하기</a><a href="skills.html" data-page="skills">스킬 검색과 선언</a></details><details class="nav-group"><summary>실행 설계</summary><a href="slots.html" data-page="slots">genos-slots</a><a href="chain.html" data-page="chain">genos-chain</a><a href="hitl.html" data-page="hitl">사용자 확인과 브릿지</a></details><details class="nav-group"><summary>데이터 전달</summary><a href="vault.html" data-page="vault">genos-vault</a><a href="tables.html" data-page="tables">표 필터와 계산</a></details><details class="nav-group"><summary>연결과 확장</summary><a href="a2a.html" data-page="a2a">A2A 위임</a><a href="prompts.html" data-page="prompts">프롬프트 편집</a><a href="memory.html" data-page="memory">대화와 장기 기억</a><a href="retrieval.html" data-page="retrieval">지식 검색</a><a href="nodes.html" data-page="nodes">모델과 MCP 노드</a></details><details class="nav-group" open><summary>운영과 디버깅</summary><a href="privacy.html" data-page="privacy">AIM과 로그 보호</a><a href="debug.html" data-page="debug">Langfuse 디버깅</a><a href="operations.html" data-page="operations">운영과 호환성</a></details><details class="nav-group"><summary>기술 참조</summary><a href="settings.html" data-page="settings">Monimo 설정 사전</a><a href="node-settings.html" data-page="node-settings">노드별 입력 선언</a><a href="environment.html" data-page="environment">환경변수 참조</a><a href="changes.html" data-page="changes">전체 변경 색인</a></details><p class="revision">v1.9.3.4<br>2026.10.16 · 7936b3166d</p></aside>
+<main id="main"><div class="page-kicker">MONIMO DOCUMENTATION</div><h1>Langfuse 디버깅</h1><div class="page-actions"><button id="expand-all">이 페이지 모두 펼치기</button><button id="collapse-all">모두 접기</button></div><article><p>모델이 어떤 도구를 골랐는지, 서버가 어떤 값으로 실행했는지, 어느 단계에서 멈췄는지를 구분해 확인합니다. 아래 관측 이름과 메타데이터는 이 가이드의 기준 커밋에 해당합니다. 배포 버전이 다르면 먼저 해당 실행의 버전을 확인하세요.</p>
+<details class="section section-2" id="_1"><summary><span role="heading" aria-level="2">문제가 발생한 실행 찾기</span></summary><div class="section-body">
+<ol>
+<li>
+<p>재현 시각과 시간대, 배포 환경, 플로우 이름, 대화 ID를 기록합니다. Trace ID가 있다면 함께 기록하세요.</p>
+</li>
+<li>
+<p>Langfuse에서 해당 배포가 전송하는 프로젝트를 열고 Traces의 시간 범위를 재현 시각으로 좁힙니다. 환경을 기록하는 배포라면 Environment도 맞춥니다.</p>
+</li>
+<li>
+<p>Trace ID로 실행을 찾습니다. ID가 없다면 시간과 플로우 이름으로 후보를 찾고 Input과 대화 문맥을 대조합니다. Session ID가 기록된 실행은 Sessions에서 이전·이후 턴을 함께 볼 수 있습니다.</p>
+</li>
+<li>
+<p>실행을 열고 관측 트리에서 모델 호출과 업무 도구를 순서대로 선택합니다. 각 단계의 Input, Output, Metadata, Level, Status Message를 확인하세요.</p>
+</li>
+</ol>
+<p>Flowise가 독립 trace를 만들 때는 <code>chatId</code>를 <code>sessionId</code>로 설정합니다. 상위 서비스의 trace에 합류할 때는 상위 trace 속성을 덮어쓰지 않으므로, Session ID가 항상 Flowise 대화 ID와 같다고 가정하지 마세요. <a href="https://langfuse.com/docs/observability/data-model">Langfuse의 trace와 session 개념</a> · <a href="https://langfuse.com/docs/observability/features/sessions">Sessions 사용법</a>.</p>
+</div></details><details class="section section-2" id="_2"><summary><span role="heading" aria-level="2">화면에서 확인할 위치</span></summary><div class="section-body">
+<figure><a href="assets/langfuse-log-level.png" target="_blank" rel="noopener"><img src="assets/langfuse-log-level.png" alt="Langfuse 공식 예제에서 관측 트리와 상태 메시지 확인하기" loading="lazy"></a><figcaption>Langfuse 공식 예제에서 관측 트리와 상태 메시지 확인하기 · 눌러 원본 보기</figcaption></figure>
+
+<p>Langfuse 공식 문서의 예제 화면입니다. <strong>오른쪽 관측 트리</strong>에서 단계를 고르면 <strong>왼쪽 Input·Output·Status Message</strong>로 상세 내용을 확인할 수 있습니다. 위 예제의 <code>retrieval</code>과 <code>WARNING</code>은 화면 설명용이며 GenOS 실행 데이터가 아닙니다. 설치된 Langfuse 버전에 따라 배치는 다를 수 있습니다. <a href="https://langfuse.com/docs/observability/features/log-levels">이미지 출처와 로그 수준 설명</a>.</p>
+</div></details><details class="section section-2" id="genos-chain"><summary><span role="heading" aria-level="2">genos-chain의 다음 도구 확인하기</span></summary><div class="section-body">
+<p>후속 업무 도구 이름을 찾고 Metadata의 <code>invocation_origin: "genos_chain"</code>을 확인합니다. Input은 경로 참조·Vault 복원·해당 MCP 스키마의 <code>qvo</code> 감싸기 등을 거친 실제 호출 인자입니다. 모델의 tool call 인자와 다를 수 있으므로 서버가 실행한 단계의 Input을 기준으로 비교하세요.</p>
+<p>계좌 선택 예제에서는 조회 도구의 Output에서 후보 행을 확인하고, 승인 뒤 <code>use_account</code>의 Input에 선택한 행의 <code>account</code>가 들어갔는지 봅니다. 거절·취소했다면 후속 업무 호출이 실행되지 않았는지 확인합니다. 카드의 선택값과 체크포인트는 실행 이력도 함께 대조하세요. Langfuse의 도구 span 하나만으로 사용자 카드의 표시나 클릭까지 입증할 수는 없습니다.</p>
+<p><code>GENOS_CHAIN_INVALID</code> 피드백이 있으면 선언 오류와 마지막으로 완료된 업무 호출을 분리해 봅니다. 후속 단계 오류를 해결하려고 이미 완료된 업무 도구를 다시 호출하지 마세요. 최종 성공은 마지막 업무 결과와 사용자에게 전달된 결과까지 확인해야 합니다.</p>
+</div></details><details class="section section-2" id="genos-vault"><summary><span role="heading" aria-level="2">genos-vault의 복원 전후 비교하기</span></summary><div class="section-body">
+<p><code>&lt;도구 이름&gt; · Vault 인자 복원</code> 단계를 찾으세요. Metadata의 <code>stage: "vault_argument_resolution"</code>과 <code>resolution_status</code>로 복원 단계와 성공·실패를 구분합니다.</p>
+<table>
+<thead>
+<tr>
+<th>확인할 항목</th>
+<th>읽는 방법</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input의 <code>agent_arguments</code></td>
+<td>모델 또는 체인이 보낸 참조 포함 인자</td>
+</tr>
+<tr>
+<td>Input의 <code>resolved_arguments</code></td>
+<td>서버가 복원한 인자. 실패 시 null일 수 있음</td>
+</tr>
+<tr>
+<td>Output의 <code>references</code></td>
+<td>성공한 복원에서 처리한 참조 수</td>
+</tr>
+<tr>
+<td>Metadata의 <code>resolution_status</code></td>
+<td><code>resolved</code> 또는 <code>failed</code></td>
+</tr>
+<tr>
+<td>실패 시 <code>error_code</code>와 <code>tool_executed: false</code></td>
+<td>복원 실패로 업무 도구가 실행되지 않은 경우</td>
+</tr>
+<tr>
+<td><code>vault_snapshot_status</code>와 스냅샷 단계</td>
+<td>진단용 스냅샷의 저장 상태. 업무 호출 성공과 별도로 확인</td>
+</tr>
+</tbody>
+</table>
+<p>큰 복원 본문은 <code>&lt;도구 이름&gt; · Vault 스냅샷</code> 아래 여러 관측으로 나뉠 수 있습니다. 복원 단계에 원문 전체가 보이지 않으면 하위 스냅샷과 상태를 확인하세요. 로그 보호 설정에 따라 Input·Output이 마스킹되거나 암호화되어 보일 수 있습니다. 빈 화면만으로 값이 없었다고 판단하거나, 확인을 위해 로그 보호를 끄지 마세요.</p>
+<p>데모의 잔액 참조를 사용했다면 <code>agent_arguments</code>에는 <code>{{$vault.CUSTOMER_a0000000-0000-4000-8000-000000000001.balance}}</code>, <code>resolved_arguments</code>에는 숫자 <code>120000</code>이 대응하는지 비교합니다. 실제 실행에서는 그 실행이 발급한 참조를 사용하세요. 복원 실패라면 오류 경로와 코드를 보고 수정하며, 업무 도구 재실행을 복원 점검의 대용으로 삼지 않습니다.</p>
+</div></details><details class="section section-2" id="genos-slots"><summary><span role="heading" aria-level="2">genos-slots의 검증과 확정 확인하기</span></summary><div class="section-body">
+<p>후보 조회 → 검증도구 → <code>slot_fill</code> → 입구도구 순서로 봅니다. 이 가이드의 예제라면 <code>lookup_accounts</code>, <code>verify_account</code>, <code>slot_fill</code>, <code>verify_amount</code>, <code>slot_fill</code>, <code>prepare_transfer</code>를 확인합니다.</p>
+<p>검증도구 Output의 <code>payload.mcpSuccess</code>와 그 직전 Input을 확인한 뒤, <code>slot_fill</code>의 결과를 대조하세요. 검증 성공과 슬롯 확정은 다른 단계입니다. 계좌를 다시 검증한 뒤라면 금액에 대해 새 검증과 확정이 있었는지도 확인해야 합니다.</p>
+<p>슬롯 입구도구의 Metadata에는 <code>invocation_origin: "genos_slot"</code>, <code>tool_call_id</code>, <code>node_id</code>가 기록됩니다. Input은 서버가 확정된 슬롯과 <code>입력포맷</code>으로 구성한 인자이며 모델이 제안한 인자와 다를 수 있습니다. 화면의 실행 이력은 마스킹된 값을 사용할 수 있으므로, 로그 보호가 적용된 Langfuse 입력과 표시 모양이 같아야 한다고 가정하지 마세요. 체인에서 입구도구를 호출했다면 호출 출처는 <code>genos_chain</code>으로 표시됩니다.</p>
+<p><code>SLOTS_INCOMPLETE</code>라면 피드백의 <code>missing</code>과 <code>unvalidated</code>를 확인해 어느 슬롯의 값 또는 최신 검증 근거가 부족한지 찾습니다. 이 경우를 실제 입구도구 실행 실패와 구분하려면 업무 도구의 실행 여부도 확인해야 합니다.</p>
+</div></details><details class="section section-2" id="_3"><summary><span role="heading" aria-level="2">오류와 대기와 재개 구분하기</span></summary><div class="section-body">
+<p>관측의 <code>ERROR</code>와 Status Message를 먼저 보고, 이어서 Output의 업무 성공·실패 필드를 확인합니다. 기준 코드의 도구 오류 처리기는 <code>Tool execution failed</code>를 기록하지만, 도구가 예외 없이 반환한 업무 실패 JSON까지 항상 ERROR가 되는 것은 아닙니다. 부모 단계가 정상으로 보여도 실패한 자식과 최종 결과를 함께 확인하세요.</p>
+<p>사용자 응답 대기는 업무 실패와 다릅니다. 최초 실행에서 멈춘 위치와 재개 실행의 Trace ID·Session ID·부모 관측 연결을 대조하고, 승인·거절·취소 이후에 실행된 도구를 확인하세요. 위임이 있었다면 실제 MonimoAgent의 위임 호출, A2A 처리, 자식 도구, 부모의 종료까지 따라갑니다. 직접 A2A 노드 호출만으로 같은 경로를 확인했다고 판단하지 않습니다.</p>
+<p>카드 질문이 의도와 다르면 <code>request_user_input.question</code>과 실제 표시를 비교하세요. assistant 본문과 별도 reasoning 데이터는 질문과 구분해서 확인합니다. 디버깅용 설명을 질문에 이어 붙이거나 실행 응답 전체로 질문을 대체하지 않습니다.</p>
+<p>문제를 전달할 때는 배포 버전, 재현 시각·시간대, Trace URL과 관측 ID, 기대 결과, 실제 결과, 최초·재개 여부, 이미 완료된 업무 호출을 함께 남기세요. 원문 개인정보나 비밀값 대신 승인된 보호 로그와 식별자를 사용합니다.</p>
+</div></details><details class="section section-2" id="_4"><summary><span role="heading" aria-level="2">실행이 보이지 않을 때</span></summary><div class="section-body">
+<p>시간 범위·프로젝트·배포 환경을 먼저 확인하고, 이후 Flowise의 추적 설정과 전송 실패 로그를 확인합니다. 기준 코드의 전역 환경변수 경로는 <code>LANGFUSE_ENABLED=true</code>와 <code>LANGFUSE_SECRET_KEY</code>, <code>LANGFUSE_PUBLIC_KEY</code>, <code>LANGFUSE_BASE_URL</code>이 모두 있어야 활성화됩니다. 플로우별 Analytics 설정도 지원하므로 실제 사용 중인 경로를 확인하세요. 키 값 자체를 문서나 화면 캡처에 붙이지 않습니다.</p>
+<p>상위 서비스와 Flowise trace가 갈라진다면 전달된 trace 문맥과 부모 관측 연결을 확인하세요. SDK가 전송을 시도한 것과 Langfuse에 관측이 저장된 것은 다릅니다. Langfuse에서 해당 Trace ID의 실제 관측이 조회되는지까지 확인해야 합니다.</p>
+<p><a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/handler.ts">기준 코드의 trace 생성과 도구 기록</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/nodes/agentflow/MonimoAgent/MonimoAgent.ts">체인과 슬롯 실행</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/vaultArguments.ts">Vault 복원 기록</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genos/internalToolTrace.ts">내부 도구 기록</a> · <a href="https://github.com/genonai/GenOS/blob/7936b3166da1127a1e9e9161ed89efb4a8abbfbd/flowise/3.0.0/before_install/packages/components/src/genosLangfuse.ts">전역 추적 설정</a>.</p></div></details></article><footer>기준 7936b3166d · 내용 수정은 content/debug.md<br>동작 설명과 합성 데모는 배포 환경의 출시 검증을 대신하지 않습니다.</footer></main></body></html>

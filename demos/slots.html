@@ -1,0 +1,45 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>슬롯 검증과 확정 데모</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../assets/style.css"><body class="demo"><div id="slots-lesson">
+  <div class="viz-controls">
+    <button type="button" class="btn" data-op="verify-account">계좌 검증</button>
+    <button type="button" class="btn" data-op="fill-account">계좌 확정</button>
+    <button type="button" class="btn" data-op="verify-amount">금액 검증</button>
+    <button type="button" class="btn" data-op="fill-amount">금액 확정</button>
+    <button type="button" class="btn" data-op="fail-account">계좌 검증 실패</button>
+    <button type="button" class="btn btn-primary" data-op="entry">입구도구 호출</button>
+    <button type="button" class="btn btn-ghost" data-op="reset">처음부터</button>
+  </div>
+  <table class="table"><thead><tr><th>슬롯</th><th>최신 검증 근거</th><th>확정값</th></tr></thead><tbody>
+    <tr><td>계좌</td><td id="slot-account-evidence"></td><td id="slot-account-value"></td></tr>
+    <tr><td>금액</td><td id="slot-amount-evidence"></td><td id="slot-amount-value"></td></tr>
+  </tbody></table>
+  <p id="slot-lock"></p><p id="slot-event" aria-live="polite"></p><pre><code id="slot-args"></code></pre>
+</div>
+<style>
+#slots-lesson pre{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--foreground);margin-bottom:0}
+#slots-lesson td{overflow-wrap:anywhere}
+</style>
+<script>
+(()=>{
+ const root=document.getElementById('slots-lesson');
+ const defaults=()=>({accountEvidence:'none',accountFilled:false,amountEvidence:false,amountFilled:false,event:'두 값을 검증하고 확정해야 입구도구가 열립니다.',entry:null});
+ let state=defaults();
+ const draw=()=>{root.querySelector('#slot-account-evidence').textContent=state.accountEvidence==='ok'?'통과':state.accountEvidence==='failed'?'실패':'없음';root.querySelector('#slot-account-value').textContent=state.accountFilled?'DEMO-A / 예제 은행':'미확정';root.querySelector('#slot-amount-evidence').textContent=state.amountEvidence?'DEMO-A 기준 통과':'없음';root.querySelector('#slot-amount-value').textContent=state.amountFilled?'50000':'미확정';root.querySelector('#slot-lock').textContent=state.accountFilled&&state.amountFilled?'prepare_transfer: 실행 가능':'prepare_transfer: 잠김';root.querySelector('#slot-event').textContent=state.event;root.querySelector('#slot-args').textContent=state.entry?JSON.stringify(state.entry,null,2):'';};
+ const restore=(v,p)=>{state=defaults();if(v&&['none','ok','failed'].includes(v.accountEvidence)){state.accountEvidence=v.accountEvidence;state.accountFilled=v.accountFilled===true&&v.accountEvidence==='ok';state.amountEvidence=v.amountEvidence===true&&state.accountFilled;state.amountFilled=v.amountFilled===true&&state.amountEvidence;}if(typeof p?.event==='string'&&p.event.length<500)state.event=p.event;if(p?.dispatch===true)state.entry=state.accountFilled&&state.amountFilled?{tool:'prepare_transfer',args:{qvo:{account:'DEMO-A',amount:50000}}}:{error:'SLOTS_INCOMPLETE',missing:[...(!state.accountFilled?['계좌']:[]),...(!state.amountFilled?['금액']:[])],toolExecuted:false};draw();};
+ restore(window.openai?.widgetState?.modelContent,window.openai?.widgetState?.privateContent);
+ root.querySelectorAll('[data-op]').forEach(button=>button.addEventListener('click',()=>{
+  state.entry=null;
+  switch(button.dataset.op){
+   case'verify-account':state.accountFilled=false;state.amountEvidence=false;state.amountFilled=false;state.accountEvidence='ok';state.event='새 계좌 검증이 통과했습니다. 이전 계좌와 의존 금액의 승인은 취소되었으므로 계좌를 다시 확정하세요.';break;
+   case'fill-account':if(state.accountEvidence==='ok'){state.accountFilled=true;state.event='slot_fill이 검증된 계좌 객체를 확정했습니다.';}else state.event='확정 거절: 먼저 계좌 검증도구를 호출해 통과해야 합니다.';break;
+   case'verify-amount':state.amountEvidence=false;state.amountFilled=false;if(state.accountFilled){state.amountEvidence=true;state.event='DEMO-A 기준 금액 검증이 통과했습니다. 아직 금액은 확정되지 않았습니다.';}else state.event='금액 검증에는 현재 확정된 계좌가 필요합니다.';break;
+   case'fill-amount':if(state.amountEvidence&&state.accountFilled){state.amountFilled=true;state.event='slot_fill이 최신 검증 근거로 50000을 확정했습니다.';}else state.event='확정 거절: 현재 계좌를 기준으로 금액을 먼저 검증하세요.';break;
+   case'fail-account':state.accountEvidence='failed';state.accountFilled=false;state.amountEvidence=false;state.amountFilled=false;state.event='검증이 실패해도 이전 계좌와 의존 금액의 승인은 취소됩니다.';break;
+   case'entry':if(state.accountFilled&&state.amountFilled){state.entry={tool:'prepare_transfer',args:{qvo:{account:'DEMO-A',amount:50000}}};state.event='입구도구 인자는 입력포맷과 서버의 확정값으로 구성합니다. 데모는 호출 단계에서 끝납니다.';}else{state.entry={error:'SLOTS_INCOMPLETE',missing:[...(!state.accountFilled?['계좌']:[]),...(!state.amountFilled?['금액']:[])],toolExecuted:false};state.event='입구도구 호출 거절: 미확정 슬롯이 있어 잠금이 유지됩니다.';}break;
+   case'reset':state=defaults();break;
+  }
+  draw();window.openai?.setWidgetState?.({modelContent:{demo:'slots',accountEvidence:state.accountEvidence,accountFilled:state.accountFilled,amountEvidence:state.amountEvidence,amountFilled:state.amountFilled},privateContent:{event:state.event,dispatch:state.entry!==null}}).catch(()=>{});
+ }));
+ window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState.modelContent,e.detail.globals.widgetState.privateContent);});
+})();
+</script>
+</body></html>
